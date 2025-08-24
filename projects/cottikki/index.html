@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Котик из HTTP API 😺</title>
+  <style>
+    :root { --bg:#0b1020; --card:#121a33; --text:#e7ecff; --muted:#9fb1ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: radial-gradient(1000px 600px at 20% -10%, #1b2a62 0%, #0b1020 45%) fixed; color: var(--text); }
+    .wrap { max-width: 900px; margin: 32px auto; padding: 20px; }
+    .card { background: color-mix(in srgb, var(--card), #000 8%); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); }
+    h1 { margin: 0 0 8px; letter-spacing: .3px; }
+    p { margin: 6px 0 18px; color: var(--muted); }
+    .row { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 880px) { .row { grid-template-columns: 1.2fr .8fr; } }
+    button { appearance: none; background: linear-gradient(180deg, #7aa8ff, #5e86ff); color: #fff; border: none; padding: 12px 16px; border-radius: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(94,134,255,.35); }
+    button[disabled] { opacity: .6; cursor: progress; }
+    .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .imgBox { position: relative; border-radius: 16px; overflow: hidden; min-height: 320px; background: #0a0f26; border: 1px solid rgba(255,255,255,.06); display: grid; place-items: center; }
+    .imgBox img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .status { font-size: 14px; color: var(--muted); }
+    .json { background: #0a0f26; border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 12px; overflow: auto; max-height: 480px; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d6e1ff; }
+    .hint { font-size: 12px; color: #c3d1ff; opacity: .8; margin-top: 6px; }
+    code { background: rgba(255,255,255,.08); padding: 2px 6px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .footer { opacity: .7; margin-top: 18px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Мини‑сайт на «чистом» HTTP</h1>
+      <p>Запрашиваем картинку котика по <code>GET https://api.thecatapi.com/v1/images/search</code> и показываем результат. Никаких SDK — только HTTP и JSON.</p>
+
+      <div class="toolbar">
+        <button id="btn">Новый котик 😺</button>
+        <span class="status" id="status">Готово</span>
+      </div>
+
+      <div class="row" style="margin-top:16px;">
+        <div>
+          <div class="imgBox" id="imgBox">
+            <span class="status">Нажмите «Новый котик»</span>
+          </div>
+          <div class="hint">Поддерживаются CORS, ключ не обязателен для тестов (у Cat API есть лимиты без ключа).</div>
+        </div>
+        <div>
+          <div class="json" id="json">{/* Здесь появится JSON ответ */}</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p><strong>Как это работает?</strong> Кнопка вызывает <code>fetch()</code> → HTTP‑запрос → ответ в JSON → берём <code>data[0].url</code> и подставляем в <code>&lt;img&gt;</code>.</p>
+        <p>Хочешь заменить API? Подставь любой другой публичный <code>GET</code> (например, <code>https://v2.jokeapi.dev/joke/Any</code>) и выведи поле <code>joke</code> или <code>setup</code>/<code>delivery</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('btn');
+    const statusEl = document.getElementById('status');
+    const imgBox = document.getElementById('imgBox');
+    const jsonBox = document.getElementById('json');
+
+    async function loadCat() {
+      btn.disabled = true;
+      statusEl.textContent = 'Загружаю…';
+      imgBox.innerHTML = '<span class="status">Получаем изображение…</span>';
+      jsonBox.textContent = '';
+
+      try {
+        // 1) Делаем обычный HTTP GET запрос
+        const resp = await fetch('https://api.thecatapi.com/v1/images/search');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        // 2) Парсим JSON
+        const data = await resp.json();
+        const item = Array.isArray(data) && data[0] ? data[0] : null;
+        if (!item || !item.url) throw new Error('Неожиданный формат ответа');
+
+        // 3) Рендерим изображение
+        const img = new Image();
+        img.alt = 'Случайный котик из The Cat API';
+        img.decoding = 'async';
+        img.loading = 'lazy';
+        img.src = item.url;
+        imgBox.innerHTML = '';
+        imgBox.appendChild(img);
+
+        // 4) Показываем сырой JSON красиво
+        jsonBox.textContent = JSON.stringify(item, null, 2);
+        statusEl.textContent = 'Готово';
+      } catch (err) {
+        statusEl.textContent = 'Ошибка';
+        imgBox.innerHTML = `<span class="status">Упс: ${err.message}</span>`;
+        jsonBox.textContent = (err && err.stack) ? err.stack : String(err);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener('click', loadCat);
+  </script>
+</body>
+</html>
