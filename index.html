@@ -90,16 +90,16 @@
 
   <img id="logo" alt="Логотип">
 
-  <h1 id="title">Trixxi Forest</h1>
+  <h1 id="title"></h1>
 
   <div class="links-container" id="links"></div>
 
   <script>
-    fetch("data.json")
+    fetch("data.json?v=" + Date.now()) // добавил анти-кэш
       .then(r => r.json())
       .then(data => {
         document.getElementById("logo").src = data.logo;
-        document.getElementById("title").textContent = "Trixxi Forest";
+        document.getElementById("title").textContent = data.title;
 
         const linksDiv = document.getElementById("links");
         linksDiv.innerHTML = data.links.map(l => `
