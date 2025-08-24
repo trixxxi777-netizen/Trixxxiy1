@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Польские времена — мини-тренажёр</title>
+<style>
+body { margin:0; font-family:system-ui,sans-serif; background:#0b1020; color:#e7ecff; }
+.wrap { max-width:900px; margin:0 auto; padding:24px; }
+.card { background:#111735; border-radius:18px; padding:20px; border:1px solid #273063; }
+h1 { margin:0 0 8px; }
+button { cursor:pointer; font-weight:600; border:none; padding:12px 16px; border-radius:12px; background:#4c6fff; color:white; margin-right:10px; }
+button.secondary { background:#2a335f; border:1px solid #3a4482; }
+.row { margin-top:12px; padding:14px; background:#0e1533; border-radius:14px; border:1px solid #273063; }
+.lbl { font-size:13px; color:#94a3ff; text-transform:uppercase; margin-bottom:4px; }
+.big { font-size:22px; }
+.mid { font-size:16px; color:#a9b8ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>Мини‑тренажёр польских времен</h1>
+<p>Две кнопки: первая меняет местоимение, вторая подставляет глагол в случайном времени (прошедшее или сложное будущее) с переводом на украинский и польский.</p>
+
+<button id="btnPron">🔀 Случайное местоимение</button>
+<button id="btnVerb" class="secondary">⚡ Подобрать глагол</button>
+
+<div class="row">
+<div class="lbl">Местоимение (RU → UK → PL)</div>
+<div class="big" id="pronRow">—</div>
+</div>
+
+<div class="row">
+<div class="lbl">Фраза</div>
+<div class="big" id="outPhrase">—</div>
+</div>
+
+<div class="row">
+<div class="lbl">Перевод</div>
+<div class="mid" id="translation">—</div>
+</div>
+
+</div>
+</div>
+
+<script>
+// Местоимения
+const PRONOUNS = [
+{ ru:'я', uk:'я', pl:'ja', person:1, number:'sg' },
+{ ru:'ты', uk:'ти', pl:'ty', person:2, number:'sg' },
+{ ru:'он', uk:'він', pl:'on', person:3, number:'sg', gender:'m' },
+{ ru:'она', uk:'вона', pl:'ona', person:3, number:'sg', gender:'f' },
+{ ru:'оно', uk:'воно', pl:'ono', person:3, number:'sg', gender:'n' },
+{ ru:'мы', uk:'ми', pl:'my', person:1, number:'pl' },
+{ ru:'вы', uk:'ви', pl:'wy', person:2, number:'pl' },
+{ ru:'они', uk:'вони', pl:'oni', person:3, number:'pl', mascPersonal:true },
+{ ru:'оне', uk:'оні', pl:'one', person:3, number:'pl', mascPersonal:false },
+];
+
+// Глаголы (пример)
+const VERBS = [
+{ ru:'учиться', uk:'вчитися', pl:'uczyć się', refl:true },
+{ ru:'читать', uk:'читати', pl:'czytać' },
+{ ru:'делать', uk:'робити', pl:'robić' },
+{ ru:'говорить', uk:'говорити', pl:'mówić' }
+];
+
+// Вспомогательные функции
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+let currentPron = pick(PRONOUNS);
+
+function showPron(){ 
+  document.getElementById('pronRow').textContent = `${currentPron.ru} → ${currentPron.uk} → ${currentPron.pl}`;
+}
+
+function makePhrase(){
+  const v = pick(VERBS);
+  const tense = Math.random()<0.5 ? 'past' : 'fut';
+  
+  let ruVerb, ukVerb, plVerb;
+  if(tense==='past'){
+    ruVerb = pastRU(v.ru, currentPron);
+    ukVerb = pastUK(v.uk, currentPron);
+    plVerb = pastPL(v.pl, currentPron);
+  } else {
+    ruVerb = futRU(v.ru, currentPron);
+    ukVerb = futUK(v.uk, currentPron);
+    plVerb = futPL(v.pl, currentPron);
+  }
+  
+  document.getElementById('outPhrase').textContent = `${currentPron.ru} ${ruVerb}`;
+  document.getElementById('translation').textContent = `${currentPron.uk} ${ukVerb}  —  ${currentPron.pl} ${plVerb}`;
+}
+
+// Простые реализации времени
+function pastRU(inf, pron){ return inf.replace(/ться$/,'ся') + 'л'; }
+function futRU(inf, pron){ return 'буду ' + inf; }
+function pastUK(inf, pron){ return inf + 'в'; }
+function futUK(inf, pron){ return 'буду ' + inf; }
+function pastPL(inf, pron){ return inf + 'łem'; }
+function futPL(inf, pron){ return 'będę ' + inf; }
+
+// Инициализация
+showPron();
+document.getElementById('btnPron').addEventListener('click', ()=>{
+  currentPron = pick(PRONOUNS);
+  showPron();
+});
+document.getElementById('btnVerb').addEventListener('click', makePhrase);
+
+</script>
+</body>
+</html>
