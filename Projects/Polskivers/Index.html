@@ -343,26 +343,7 @@ const btnPron = document.getElementById('btnPron');
 const btnVerb = document.getElementById('btnVerb');
 btnPron.addEventListener('click', ()=>{ currentPron = pick(PRONOUNS); showPronoun(); });
 btnVerb.addEventListener('click', ()=>{ makePhrase(); });
-<style>
-  /* Стили только для кнопки "На главную" */
-  .back-home {
-    display: inline-block;
-    margin: 20px 0;
-    padding: 10px 20px;
-    background-color: #8b5a2b; /* коричневый */
-    color: #fff;
-    text-decoration: none;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: 0.3s;
-  }
 
-  .back-home:hover {
-    background-color: #6b4221;
-    transform: scale(1.05);
-  }
-</style>
-  <a href="../../index.html" class="back-home">На главную</a>
 </script>
 </body>
 </html>
