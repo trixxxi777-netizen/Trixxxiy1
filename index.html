@@ -17,9 +17,9 @@
 
     /* Логотип сверху */
     #logo {
-      max-width: 500px; /* уменьшаем размер */
+      max-width: 500px;
       height: auto;
-      margin: 20px 0;   /* отступ сверху и снизу */
+      margin: 20px 0;
       display: block;
     }
 
@@ -34,14 +34,14 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-      align-items: center; /* кнопки по центру */
+      align-items: center;
       width: 100%;
     }
 
     .link-card {
       display: block;
       text-decoration: none;
-      background-color: #8b5a2b; /* коричневый */
+      background-color: #8b5a2b;
       color: #fff;
       padding: 20px 30px;
       border-radius: 15px;
@@ -71,7 +71,6 @@
       margin-right: 10px;
     }
 
-    /* Адаптивность для мобильных */
     @media (max-width: 800px) {
       #logo {
         max-width: 150px;
@@ -85,6 +84,10 @@
       }
     }
   </style>
+  <!-- Заголовки для отключения кэша -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 </head>
 <body>
 
@@ -95,7 +98,8 @@
   <div class="links-container" id="links"></div>
 
   <script>
-    fetch("data.json?v=" + Date.now()) // добавил анти-кэш
+    // грузим JSON всегда свежий
+    fetch("data.json?v=" + Date.now())
       .then(r => r.json())
       .then(data => {
         document.getElementById("logo").src = data.logo;
