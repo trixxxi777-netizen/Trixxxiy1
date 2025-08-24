@@ -4,7 +4,7 @@
   "links": [
     { "name": "Случайный котик", "url": "projects/cottikki/index.html", "desc": "котики🐈‍⬛", "icon": "🎮" },
     { "name": "Polski глаголы", "url": "projects/polskivers/index.html", "desc": "Случайный глагол", "icon": "📚" },
-    { "name": "нема пока ниче", "url": "https://phrases.netlify.app", "desc": "подробнее", "icon": "💬" },
+    { "name": "Глаголы ukr-pol-rus", "url": "projects/ukrpolrus/ukrpolrus.html", "desc": "подробнее", "icon": "💬" },
     { "name": "тоже нема", "url": "https://conjugationtest.netlify.app", "desc": "подробнее", "icon": "📝" }
   ]
 }
