@@ -1,6 +1,6 @@
 {
   "logo": "logo.png",
-  "title": "Trixxy Forest",
+  "title": "Trixxi Forest",
   "links": [
     { "name": "Случайный котик", "url": "https://cottikki.netlify.app", "desc": "котики🐈‍⬛", "icon": "🎮" },
     { "name": "Польские глаголы", "url": "https://polskivers.netlify.app", "desc": "Случайный глагол", "icon": "📚" },
