@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Trixxi Forest</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1b3a2f; /* тёмно-зелёный фон */
+      color: #fff;
+      margin: 0;
+      display: flex;
+      flex-direction: column; /* сверху вниз */
+      align-items: center;    /* центрируем по горизонтали */
+      min-height: 100vh;
+    }
+
+    /* Логотип сверху */
+    #logo {
+      max-width: 500px; /* уменьшаем размер */
+      height: auto;
+      margin: 20px 0;   /* отступ сверху и снизу */
+      display: block;
+    }
+
+    h1 {
+      margin: 10px 0 30px 0;
+      font-size: 3em;
+      color: #f0e6d2;
+      text-align: center;
+    }
+
+    .links-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center; /* кнопки по центру */
+      width: 100%;
+    }
+
+    .link-card {
+      display: block;
+      text-decoration: none;
+      background-color: #8b5a2b; /* коричневый */
+      color: #fff;
+      padding: 20px 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 80%;
+      box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+      transition: 0.3s;
+      text-align: left;
+      font-size: 1.2em;
+    }
+
+    .link-card:hover {
+      background-color: #6b4221;
+      transform: scale(1.05);
+    }
+
+    .link-title {
+      font-weight: bold;
+      font-size: 1.4em;
+    }
+    .link-desc {
+      font-size: 1em;
+      margin-top: 6px;
+      color: #e0d9c4;
+    }
+    .link-icon {
+      margin-right: 10px;
+    }
+
+    /* Адаптивность для мобильных */
+    @media (max-width: 800px) {
+      #logo {
+        max-width: 150px;
+      }
+      h1 {
+        font-size: 2.2em;
+      }
+      .link-card {
+        max-width: 90%;
+        font-size: 1.1em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <img id="logo" alt="Логотип">
+
+  <h1 id="title">Trixxi Forest</h1>
+
+  <div class="links-container" id="links"></div>
+
+  <script>
+    fetch("data.json")
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById("logo").src = data.logo;
+        document.getElementById("title").textContent = "Trixxi Forest";
+
+        const linksDiv = document.getElementById("links");
+        linksDiv.innerHTML = data.links.map(l => `
+          <a href="${l.url}" target="_blank" class="link-card">
+            <span class="link-icon">${l.icon || ''}</span>
+            <span class="link-title">${l.name}</span>
+            <div class="link-desc">${l.desc || ''}</div>
+          </a>
+        `).join("");
+      })
+      .catch(err => {
+        document.getElementById("title").textContent = "Ошибка загрузки данных";
+        console.error(err);
+      });
+  </script>
+
+</body>
+</html>
