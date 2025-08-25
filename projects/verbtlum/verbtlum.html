@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Польские глаголы</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  .verb-box { margin-bottom: 10px; }
+  button { margin-right: 10px; }
+  #stats { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Угадай перевод польского глагола</h1>
+
+<div class="verb-box">
+  <button id="newVerb">Новый глагол</button>
+  <span id="polishVerb">–</span>
+</div>
+
+<div class="verb-box">
+  <button id="showTranslation">Показать перевод</button>
+  <span id="russianTranslation"></span>
+</div>
+
+<div class="verb-box">
+  <label>
+    <input type="checkbox" id="correctMark">
+    Я угадал
+  </label>
+</div>
+
+<div class="verb-box">
+  <button id="showStats">Показать статистику</button>
+</div>
+
+<div id="stats"></div>
+
+<script>
+const verbs = [
+  {pl: 'iść', ru: 'идти'},
+  {pl: 'jeść', ru: 'есть'},
+  {pl: 'pić', ru: 'пить'},
+  {pl: 'czytać', ru: 'читать'},
+  {pl: 'pisać', ru: 'писать'},
+  {pl: 'mówić', ru: 'говорить'}
+];
+
+let currentVerb = null;
+let stats = {}; // { verb: {shown: 0, correct: 0} }
+
+function getRandomVerb() {
+  const index = Math.floor(Math.random() * verbs.length);
+  return verbs[index];
+}
+
+function newVerb() {
+  currentVerb = getRandomVerb();
+  document.getElementById('polishVerb').textContent = currentVerb.pl;
+  document.getElementById('russianTranslation').textContent = '';
+  document.getElementById('correctMark').checked = false;
+
+  if (!stats[currentVerb.pl]) {
+    stats[currentVerb.pl] = {shown: 0, correct: 0};
+  }
+  stats[currentVerb.pl].shown += 1;
+}
+
+function showTranslation() {
+  if (!currentVerb) return;
+  document.getElementById('russianTranslation').textContent = currentVerb.ru;
+}
+
+function markCorrect() {
+  if (!currentVerb) return;
+  if (document.getElementById('correctMark').checked) {
+    stats[currentVerb.pl].correct += 1;
+  } else {
+    stats[currentVerb.pl].correct -= 1; // если снял галочку
+  }
+}
+
+function showStats() {
+  let result = '<h2>Статистика:</h2><ul>';
+  for (let verb in stats) {
+    result += `<li>${verb}: показано ${stats[verb].shown} раз, правильно ${stats[verb].correct} раз</li>`;
+  }
+  result += '</ul>';
+  document.getElementById('stats').innerHTML = result;
+}
+
+document.getElementById('newVerb').addEventListener('click', newVerb);
+document.getElementById('showTranslation').addEventListener('click', showTranslation);
+document.getElementById('correctMark').addEventListener('change', markCorrect);
+document.getElementById('showStats').addEventListener('click', showStats);
+
+// Инициализация
+newVerb();
+</script>
+
+</body>
+</html>
