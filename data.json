@@ -3,8 +3,8 @@
   "title": "Trixxi Forest",
   "links": [
     { "name": "Случайный котик", "url": "projects/cottikki/index.html", "desc": "котики🐈‍⬛", "icon": "🎮" },
-    { "name": "Случайное время", "url": "projects/polskivers/index.html", "desc": "местоимение + глагол", "icon": "📚" },
-    { "name": "Polski глаголы", "url": "projects/verbtlum/verbtlum.html", "desc": "в процессе...🙂☕ ", "icon": "💬" },
+    { "name": "Ja, ty.. + время", "url": "projects/polskivers/index.html", "desc": "polski", "icon": "📚" },
+    { "name": "Перевод", "url": "projects/verbtlum/verbtlum.html", "desc": "в процессе...🙂☕ ", "icon": "💬" },
     { "name": "нема", "url": "https://conjugationtest.netlify.app", "desc": "подробнее", "icon": "📝" }
   ]
 }
