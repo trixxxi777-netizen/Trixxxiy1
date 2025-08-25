@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Польские времена — тренажёр (глагол "być")</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Noto Sans", sans-serif; }
+    body { margin: 0; background: #0b1020; color: #e7ecff; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .card { background: #111735; border: 1px solid #273063; border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    h1 { font-size: clamp(22px, 3vw, 32px); margin: 0 0 8px; letter-spacing: .3px; }
+    p.sub { margin: 0 0 18px; color: #a9b8ff; }
+    .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    button { cursor: pointer; font-weight: 600; border: none; padding: 12px 16px; border-radius: 12px; background: #4c6fff; color: white; box-shadow: 0 6px 16px rgba(76,111,255,.35); transition: transform .04s ease, filter .2s; }
+    button.secondary { background: #2a335f; box-shadow: none; color: #e7ecff; border: 1px solid #3a4482; }
+    button:active { transform: translateY(1px); }
+    .out { display: grid; gap: 10px; }
+    .row { background: #0e1533; border: 1px solid #273063; border-radius: 14px; padding: 14px; display: grid; gap: 6px; }
+    .lbl { color: #94a3ff; font-size: 13px; text-transform: uppercase; letter-spacing: .12em; }
+    .big { font-size: clamp(20px, 3.2vw, 30px); line-height: 1.25; }
+    .mid { font-size: clamp(16px, 2.6vw, 22px); line-height: 1.3; }
+    .hint { color: #9fb0ff; font-size: 13px; }
+    .flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .tag { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #1a214a; border: 1px solid #2a3474; color: #b9c5ff; }
+    .footer { margin-top: 14px; color: #9fb0ff; font-size: 13px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .grid2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 720px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Мини-тренажёр польских времен</h1>
+      <p class="sub">Только один глагол: <b>być</b> — «быть».  
+      <br><span class="hint">Выбирай местоимение и смотри формы в прошедшем, настоящем и будущем времени.</span></p>
+
+      <div class="controls">
+        <button id="btnPron">🔀 Случайное местоимение</button>
+        <button id="btnVerb" class="secondary">⚡ Показать форму</button>
+      </div>
+
+      <div class="grid2">
+        <div class="row">
+          <div class="lbl">Местоимение (RU → PL)</div>
+          <div class="big" id="pronRow">—</div>
+          <div class="flex" id="gramTags"></div>
+        </div>
+
+        <div class="row">
+          <div class="lbl">Фраза по-польски</div>
+          <div class="big" id="plOut">—</div>
+          <div class="hint" id="tenseHint">&nbsp;</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <div class="lbl">Перевод (RU)</div>
+        <div class="mid" id="ruOut">—</div>
+      </div>
+
+      <div class="footer">Глагол <span class="mono">być</span> — «быть», во всех лицах и числах, во всех трёх временах.</div>
+    </div>
+  </div>
+
+<script>
+// === ДАННЫЕ ===
+const PRONOUNS = [
+  { ru: 'я',  pl: 'ja',  person:1, number:'sg' },
+  { ru: 'ты', pl: 'ty',  person:2, number:'sg' },
+  { ru: 'он', pl: 'on',  person:3, number:'sg', gender:'m' },
+  { ru: 'она', pl: 'ona', person:3, number:'sg', gender:'f' },
+  { ru: 'оно', pl: 'ono', person:3, number:'sg', gender:'n' },
+  { ru: 'мы', pl: 'my',  person:1, number:'pl' },
+  { ru: 'вы', pl: 'wy',  person:2, number:'pl' },
+  { ru: 'они', pl: 'oni', person:3, number:'pl', mascPersonal:true },
+  { ru: 'оне', pl: 'one', person:3, number:'pl', mascPersonal:false },
+];
+
+// только один глагол — быть
+const VERB = { pl: 'być', ru: 'быть' };
+
+// --- Настоящее ---
+const POLISH_PRESENT = {
+  '1sg':'jestem', '2sg':'jesteś', '3sg':'jest',
+  '1pl':'jesteśmy','2pl':'jesteście','3pl':'są'
+};
+const RUSSIAN_PRESENT = {
+  '1sg':'(есть)', '2sg':'(есть)', '3sg':'(есть)',
+  '1pl':'(есть)','2pl':'(есть)','3pl':'(есть)'
+}; // в русском обычно опускается
+
+// --- Прошедшее ---
+const POLISH_PAST = {
+  '1sg_m': 'byłem',   '1sg_f': 'byłam',
+  '2sg_m': 'byłeś',   '2sg_f': 'byłaś',
+  '3sg_m': 'był',     '3sg_f': 'była',   '3sg_n': 'było',
+  '1pl_m': 'byliśmy', '1pl_f': 'byłyśmy',
+  '2pl_m': 'byliście','2pl_f': 'byłyście',
+  '3pl_m': 'byli',    '3pl_f': 'były'
+};
+const RUSSIAN_PAST = {
+  '1sg_m': 'был',   '1sg_f': 'была',
+  '2sg_m': 'был',   '2sg_f': 'была',
+  '3sg_m': 'был',   '3sg_f': 'была', '3sg_n': 'было',
+  '1pl': 'были', '2pl': 'были', '3pl': 'были'
+};
+
+// --- Будущее ---
+const POLISH_FUTURE = {
+  '1sg':'będę', '2sg':'będziesz', '3sg':'będzie',
+  '1pl':'będziemy','2pl':'będziecie','3pl':'będą'
+};
+const RUSSIAN_FUTURE = {
+  '1sg':'буду', '2sg':'будешь', '3sg':'будет',
+  '1pl':'будем','2pl':'будете','3pl':'будут'
+};
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+let currentPron = PRONOUNS[0];
+
+function showPronoun(){
+  const tagBox = document.getElementById('gramTags');
+  tagBox.innerHTML = '';
+  const tags = [];
+  tags.push(currentPron.number === 'sg' ? 'ед. число' : 'мн. число');
+  if (currentPron.gender) tags.push(currentPron.gender==='m' ? 'м. род' : currentPron.gender==='f' ? 'ж. род' : 'ср. род');
+  if (currentPron.number==='pl' && currentPron.person===3) tags.push(currentPron.mascPersonal ? 'муж. лица' : 'не-муж. лица');
+  document.getElementById('pronRow').innerHTML = `${currentPron.ru} → <b>${currentPron.pl}</b>`;
+  for(const t of tags){
+    const el = document.createElement('span');
+    el.className = 'tag';
+    el.textContent = t;
+    tagBox.appendChild(el);
+  }
+}
+
+function makePhrase(){
+  const tense = pick(['past','present','future']);
+  const plPron = currentPron.pl;
+  let plVerb, ruVerb;
+
+  if(tense==='past'){
+    let key;
+    if(currentPron.number==='sg'){
+      if(currentPron.person===1) key = Math.random()<0.5 ? '1sg_m':'1sg_f';
+      else if(currentPron.person===2) key = Math.random()<0.5 ? '2sg_m':'2sg_f';
+      else key = '3sg_'+(currentPron.gender||'m');
+    } else {
+      if(currentPron.person===1) key = Math.random()<0.5 ? '1pl_m':'1pl_f';
+      else if(currentPron.person===2) key = Math.random()<0.5 ? '2pl_m':'2pl_f';
+      else key = '3pl_'+(currentPron.mascPersonal?'m':'f');
+    }
+    plVerb = POLISH_PAST[key];
+    ruVerb = RUSSIAN_PAST[key] || 'были';
+  }
+  else if(tense==='present'){
+    let key = currentPron.number+currentPron.person;
+    if(key==='sg1') key='1sg';
+    if(key==='sg2') key='2sg';
+    if(key==='sg3') key='3sg';
+    if(key==='pl1') key='1pl';
+    if(key==='pl2') key='2pl';
+    if(key==='pl3') key='3pl';
+    plVerb = POLISH_PRESENT[key];
+    ruVerb = RUSSIAN_PRESENT[key];
+  }
+  else { // future
+    let key = currentPron.number+currentPron.person;
+    if(key==='sg1') key='1sg';
+    if(key==='sg2') key='2sg';
+    if(key==='sg3') key='3sg';
+    if(key==='pl1') key='1pl';
+    if(key==='pl2') key='2pl';
+    if(key==='pl3') key='3pl';
+    plVerb = POLISH_FUTURE[key];
+    ruVerb = RUSSIAN_FUTURE[key];
+  }
+
+  document.getElementById('plOut').textContent = plPron + " " + plVerb;
+  document.getElementById('ruOut').textContent = currentPron.ru + " " + ruVerb + " — (być → быть)";
+  document.getElementById('tenseHint').textContent =
+    tense==='past' ? 'Время: прошедшее (czas przeszły).' :
+    tense==='present' ? 'Время: настоящее (czas teraźniejszy).' :
+    'Время: будущее (czas przyszły).';
+}
+
+// === ИНИТ ===
+currentPron = pick(PRONOUNS);
+showPronoun();
+
+// === UI ===
+document.getElementById('btnPron').addEventListener('click', ()=>{ currentPron = pick(PRONOUNS); showPronoun(); });
+document.getElementById('btnVerb').addEventListener('click', ()=>{ makePhrase(); });
+</script>
+</body>
+</html>
