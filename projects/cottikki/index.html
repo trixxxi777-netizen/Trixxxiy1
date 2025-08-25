@@ -7,14 +7,34 @@
   <style>
     :root { --bg:#0b1020; --card:#121a33; --text:#e7ecff; --muted:#9fb1ff; }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: radial-gradient(1000px 600px at 20% -10%, #1b2a62 0%, #0b1020 45%) fixed; color: var(--text); }
-    .wrap { max-width: 900px; margin: 32px auto; padding: 20px; }
-    .card { background: color-mix(in srgb, var(--card), #000 8%); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1000px 600px at 20% -10%, #1b2a62 0%, #0b1020 45%) fixed;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 900px; margin: 32px auto; padding: 20px; width: 100%; }
+    .card { background: color-mix(in srgb, var(--card), #000 8%); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.35); width: 100%; }
     h1 { margin: 0 0 8px; letter-spacing: .3px; }
     p { margin: 6px 0 18px; color: var(--muted); }
     .row { display: grid; grid-template-columns: 1fr; gap: 16px; }
     @media (min-width: 880px) { .row { grid-template-columns: 1.2fr .8fr; } }
-    button { appearance: none; background: linear-gradient(180deg, #7aa8ff, #5e86ff); color: #fff; border: none; padding: 12px 16px; border-radius: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(94,134,255,.35); }
+    button {
+      appearance: none;
+      background: linear-gradient(180deg, #7aa8ff, #5e86ff);
+      color: #fff;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(94,134,255,.35);
+      transition: 0.2s;
+    }
     button[disabled] { opacity: .6; cursor: progress; }
     .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .imgBox { position: relative; border-radius: 16px; overflow: hidden; min-height: 320px; background: #0a0f26; border: 1px solid rgba(255,255,255,.06); display: grid; place-items: center; }
@@ -24,6 +44,10 @@
     .hint { font-size: 12px; color: #c3d1ff; opacity: .8; margin-top: 6px; }
     code { background: rgba(255,255,255,.08); padding: 2px 6px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .footer { opacity: .7; margin-top: 18px; font-size: 12px; }
+
+    /* Кнопка "На главную" внизу */
+    .home-btn-container { margin-top: 24px; text-align: center; }
+    .home-btn-container button { min-width: 140px; }
   </style>
 </head>
 <body>
@@ -53,6 +77,14 @@
         <p><strong>Как это работает?</strong> Кнопка вызывает <code>fetch()</code> → HTTP‑запрос → ответ в JSON → берём <code>data[0].url</code> и подставляем в <code>&lt;img&gt;</code>.</p>
         <p>Хочешь заменить API? Подставь любой другой публичный <code>GET</code> (например, <code>https://v2.jokeapi.dev/joke/Any</code>) и выведи поле <code>joke</code> или <code>setup</code>/<code>delivery</code>.</p>
       </div>
+
+      <!-- Кнопка "На главную" -->
+      <div class="home-btn-container">
+        <a href="/index.html">
+          <button>Strona główna</button>
+        </a>
+      </div>
+
     </div>
   </div>
 
@@ -69,16 +101,13 @@
       jsonBox.textContent = '';
 
       try {
-        // 1) Делаем обычный HTTP GET запрос
         const resp = await fetch('https://api.thecatapi.com/v1/images/search');
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
-        // 2) Парсим JSON
         const data = await resp.json();
         const item = Array.isArray(data) && data[0] ? data[0] : null;
         if (!item || !item.url) throw new Error('Неожиданный формат ответа');
 
-        // 3) Рендерим изображение
         const img = new Image();
         img.alt = 'Случайный котик из The Cat API';
         img.decoding = 'async';
@@ -87,7 +116,6 @@
         imgBox.innerHTML = '';
         imgBox.appendChild(img);
 
-        // 4) Показываем сырой JSON красиво
         jsonBox.textContent = JSON.stringify(item, null, 2);
         statusEl.textContent = 'Готово';
       } catch (err) {
