@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Польские времена — тренажёр</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Noto Sans", sans-serif; }
+    body { margin: 0; background: #0b1020; color: #e7ecff; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .card { background: #111735; border: 1px solid #273063; border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    h1 { font-size: clamp(22px, 3vw, 32px); margin: 0 0 8px; letter-spacing: .3px; }
+    p.sub { margin: 0 0 18px; color: #a9b8ff; }
+    .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    button { cursor: pointer; font-weight: 600; border: none; padding: 12px 16px; border-radius: 12px; background: #4c6fff; color: white; box-shadow: 0 6px 16px rgba(76,111,255,.35); transition: transform .04s ease, filter .2s; }
+    button.secondary { background: #2a335f; box-shadow: none; color: #e7ecff; border: 1px solid #3a4482; }
+    button:active { transform: translateY(1px); }
+    .out { display: grid; gap: 10px; }
+    .row { background: #0e1533; border: 1px solid #273063; border-radius: 14px; padding: 14px; display: grid; gap: 6px; }
+    .lbl { color: #94a3ff; font-size: 13px; text-transform: uppercase; letter-spacing: .12em; }
+    .big { font-size: clamp(20px, 3.2vw, 30px); line-height: 1.25; }
+    .mid { font-size: clamp(16px, 2.6vw, 22px); line-height: 1.3; }
+    .hint { color: #9fb0ff; font-size: 13px; }
+    .flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .tag { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #1a214a; border: 1px solid #2a3474; color: #b9c5ff; }
+    .footer { margin-top: 14px; color: #9fb0ff; font-size: 13px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .grid2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 720px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Мини‑тренажёр польских времен</h1>
+      <p class="sub">Две кнопки: первая меняет местоимение (на русском), вторая подставляет польский глагол в случайном времени (прошедшее или сложное будущее) с переводом.
+      <br><span class="hint">Перевод дан в инфинитиве на русском. Нажимай до тех пор, пока не получится что‑то восхитительно странное.</span></p>
+
+      <div class="controls">
+        <button id="btnPron">🔀 Случайное местоимение</button>
+        <button id="btnVerb" class="secondary">⚡ Подобрать глагол</button>
+      </div>
+
+      <div class="grid2">
+        <div class="row">
+          <div class="lbl">Местоимение (RU → PL)</div>
+          <div class="big" id="pronRow">—</div>
+          <div class="flex" id="gramTags"></div>
+        </div>
+
+        <div class="row">
+          <div class="lbl">Фраза по‑польски</div>
+          <div class="big" id="plOut">—</div>
+          <div class="hint" id="tenseHint">&nbsp;</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <div class="lbl">Перевод (RU)</div>
+        <div class="mid" id="ruOut">—</div>
+      </div>
+
+      <div class="footer">100 глаголов, все несовершенного вида, чтобы работали прошедшее и сложное будущее (<span class="mono">będę + bezokolicznik</span>). Возвратное <span class="mono">się</span> ставим после вспомогательного: <span class="mono">będę <b>się</b> uczyć</span>, в прошедшем — после смыслового: <span class="mono">uczyłem <b>się</b></span>.</div>
+    </div>
+  </div>
+
+<script>
+// === ДАННЫЕ ===
+const PRONOUNS = [
+  { ru: 'я',  pl: 'ja',  person:1, number:'sg' },
+  { ru: 'ты', pl: 'ty',  person:2, number:'sg' },
+  { ru: 'он', pl: 'on',  person:3, number:'sg', gender:'m' },
+  { ru: 'она', pl: 'ona', person:3, number:'sg', gender:'f' },
+  { ru: 'оно', pl: 'ono', person:3, number:'sg', gender:'n' },
+  { ru: 'мы', pl: 'my',  person:1, number:'pl' },
+  { ru: 'вы', pl: 'wy',  person:2, number:'pl' },
+  { ru: 'они', pl: 'oni', person:3, number:'pl', mascPersonal:true },
+  { ru: 'оне', pl: 'one', person:3, number:'pl', mascPersonal:false },
+];
+
+// 100 глаголов (все несов. вид). pl: инфинитив; ru: инфинитив; refl: возвратный ли (есть ли " się")
+const VERBS = [
+  {pl:'czytać', ru:'читать'},
+  {pl:'pisać', ru:'писать'},
+  {pl:'mówić', ru:'говорить'},
+  {pl:'robić', ru:'делать'},
+  {pl:'liczyć', ru:'считать'},
+  {pl:'uczyć się', ru:'учиться', refl:true},
+  {pl:'pracować', ru:'работать'},
+  {pl:'mieszkać', ru:'жить (проживать)'},
+  {pl:'myśleć', ru:'думать'},
+  {pl:'oglądać', ru:'смотреть'},
+  {pl:'słuchać', ru:'слушать'},
+  {pl:'pytać', ru:'спрашивать'},
+  {pl:'odpowiadać', ru:'отвечать'},
+  {pl:'kupować', ru:'покупать'},
+  {pl:'sprzedawać', ru:'продавать'},
+  {pl:'gotować', ru:'готовить'},
+  {pl:'sprzątać', ru:'убирать'},
+  {pl:'tańczyć', ru:'танцевать'},
+  {pl:'śpiewać', ru:'петь'},
+  {pl:'biegać', ru:'бегать'},
+  {pl:'chodzić', ru:'ходить'},
+  {pl:'pływać', ru:'плавать'},
+  {pl:'grać', ru:'играть'},
+  {pl:'jeździć', ru:'ездить'},
+  {pl:'podróżować', ru:'путешествовать'},
+  {pl:'otwierać', ru:'открывать'},
+  {pl:'zamykać', ru:'закрывать'},
+  {pl:'zaczynać', ru:'начинать'},
+  {pl:'kończyć', ru:'заканчивать'},
+  {pl:'pomagać', ru:'помогать'},
+  {pl:'próbować', ru:'пробовать'},
+  {pl:'planować', ru:'планировать'},
+  {pl:'dzwonić', ru:'звонить'},
+  {pl:'wysyłać', ru:'отправлять'},
+  {pl:'odbierać', ru:'получать/забирать'},
+  {pl:'czekać', ru:'ждать'},
+  {pl:'spotykać', ru:'встречать'},
+  {pl:'odwiedzać', ru:'навещать/посещать'},
+  {pl:'zapraszać', ru:'приглашать'},
+  {pl:'dziękować', ru:'благодарить'},
+  {pl:'prosić', ru:'просить'},
+  {pl:'szukać', ru:'искать'},
+  {pl:'znajdować', ru:'находить'},
+  {pl:'czyścić', ru:'чистить'},
+  {pl:'malować', ru:'красить/рисовать'},
+  {pl:'rysować', ru:'рисовать'},
+  {pl:'naprawiać', ru:'чинить'},
+  {pl:'używać', ru:'использовать'},
+  {pl:'zmieniać', ru:'менять'},
+  {pl:'pamiętać', ru:'помнить'},
+  {pl:'zapominać', ru:'забывать'},
+  {pl:'wierzyć', ru:'верить'},
+  {pl:'nosić', ru:'носить'},
+  {pl:'ubierać się', ru:'одеваться', refl:true},
+  {pl:'myć', ru:'мыть'},
+  {pl:'czesać', ru:'причёсывать'},
+  {pl:'budować', ru:'строить'},
+  {pl:'palić', ru:'курить/жечь'},
+  {pl:'świecić', ru:'светить'},
+  {pl:'siadać', ru:'садиться'},
+  {pl:'wstawać', ru:'вставать'},
+  {pl:'padać', ru:'падать'},
+  {pl:'lać', ru:'лить'},
+  {pl:'zamawiać', ru:'заказывать'},
+  {pl:'smażyć', ru:'жарить'},
+  {pl:'kroić', ru:'резать'},
+  {pl:'mieszać', ru:'мешать'},
+  {pl:'dodawać', ru:'добавлять'},
+  {pl:'smakować', ru:'иметь вкус/пробовать'},
+  {pl:'odpoczywać', ru:'отдыхать'},
+  {pl:'spacerować', ru:'гулять'},
+  {pl:'uśmiechać się', ru:'улыбаться', refl:true},
+  {pl:'śmiać się', ru:'смеяться', refl:true},
+  {pl:'płakać', ru:'плакать'},
+  {pl:'martwić się', ru:'переживать/волноваться', refl:true},
+  {pl:'bać się', ru:'бояться', refl:true},
+  {pl:'cieszyć się', ru:'радоваться', refl:true},
+  {pl:'interesować się', ru:'интересоваться', refl:true},
+  {pl:'denerwować się', ru:'нервничать', refl:true},
+  {pl:'nudzić się', ru:'скучать', refl:true},
+  {pl:'bawić się', ru:'развлекаться/играть', refl:true},
+  {pl:'uczyć', ru:'учить'},
+  {pl:'tłumaczyć', ru:'переводить/объяснять'},
+  {pl:'opowiadać', ru:'рассказывать'},
+  {pl:'zapisywać', ru:'записывать'},
+  {pl:'przynosić', ru:'приносить'},
+  {pl:'wynosić', ru:'выносить'},
+  {pl:'włączać', ru:'включать'},
+  {pl:'wyłączać', ru:'выключать'},
+  {pl:'pożyczać', ru:'одалживать'},
+  {pl:'kopać', ru:'копать/пинать'},
+  {pl:'ciąć', ru:'резать/рубить'},
+  {pl:'gasić', ru:'гасить'},
+  {pl:'zapalać', ru:'зажигать'},
+  {pl:'dźwigać', ru:'поднимать/нести тяжести'},
+  {pl:'ciągnąć', ru:'тянуть'},
+  {pl:'pchać', ru:'толкать'},
+  {pl:'dotykać', ru:'трогать'},
+  {pl:'całować', ru:'целовать'},
+  {pl:'żartować', ru:'шутить'},
+];
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+let currentPron = PRONOUNS[0];
+
+function showPronoun(){
+  const tagBox = document.getElementById('gramTags');
+  tagBox.innerHTML = '';
+
+  // Формируем подписи
+  const tags = [];
+  tags.push(currentPron.number === 'sg' ? 'ед. число' : 'мн. число');
+  if (currentPron.gender) tags.push(currentPron.gender === 'm' ? 'м. род' : currentPron.gender === 'f' ? 'ж. род' : 'ср. род');
+  if (currentPron.number==='pl' && currentPron.person===3) tags.push(currentPron.mascPersonal ? 'муж. лица' : 'не‑муж. лица');
+
+  document.getElementById('pronRow').innerHTML = `${currentPron.ru} → <b>${currentPron.pl}</b>`;
+  for(const t of tags){
+    const el = document.createElement('span');
+    el.className = 'tag';
+    el.textContent = t;
+    tagBox.appendChild(el);
+  }
+}
+
+function polishPast(inf, pron){
+  // Очень упрощённая модель для регулярных глаголов:
+  // pastRoot = инфинитив без конечной "ć"; далее суффиксы: ł/ła/ło/łem/łam/łeś/łaś/liśmy/łyśmy/liście/łyście/li/ły
+  const isRefl = inf.includes(' się');
+  const cleanInf = inf.replace(' się','');
+  let root = cleanInf.endsWith('ć') ? cleanInf.slice(0,-1) : cleanInf; // usuń "ć"
+
+  const endings = {
+    '1sg_m': 'łem', '1sg_f':'łam',
+    '2sg_m': 'łeś', '2sg_f':'łaś',
+    '3sg_m': 'ł',   '3sg_f':'ła', '3sg_n':'ło',
+    '1pl_m': 'liśmy', '1pl_f': 'łyśmy',
+    '2pl_m': 'liście','2pl_f': 'łyście',
+    '3pl_m': 'li',    '3pl_f': 'ły'
+  };
+
+  // Определяем нужную пару/род
+  let endKey;
+  if(pron.number==='sg'){
+    if(pron.person===1){ // ja — случайный род
+      const fem = Math.random() < 0.5;
+      endKey = '1sg_' + (fem?'f':'m');
+    } else if(pron.person===2){ // ty — случайный род
+      const fem = Math.random() < 0.5;
+      endKey = '2sg_' + (fem?'f':'m');
+    } else { // on/ona/ono
+      endKey = '3sg_' + (pron.gender||'m');
+    }
+  } else { // plural
+    if(pron.person===1){ // my — случайная муж.личность
+      const mp = Math.random() < 0.5;
+      endKey = '1pl_' + (mp?'m':'f');
+    } else if(pron.person===2){ // wy — случайная муж.личность
+      const mp = Math.random() < 0.5;
+      endKey = '2pl_' + (mp?'m':'f');
+    } else { // 3 pl: oni/one
+      endKey = '3pl_' + ((pron.mascPersonal)?'m':'f');
+    }
+  }
+
+  let verb = root + endings[endKey];
+  if(isRefl) verb += ' się';
+  return verb;
+}
+
+function polishFutureCompound(inf, pron){
+  const isRefl = inf.includes(' się');
+  const cleanInf = inf.replace(' się','');
+  const aux = (function(){
+    if(pron.number==='sg'){
+      if(pron.person===1) return 'będę';
+      if(pron.person===2) return 'będziesz';
+      return 'będzie';
+    } else {
+      if(pron.person===1) return 'będziemy';
+      if(pron.person===2) return 'będziecie';
+      return 'będą';
+    }
+  })();
+  // В сложном будущем "się" ставится после вспомогательного
+  return `${aux}${isRefl?' się':''} ${cleanInf}`;
+}
+
+function russianPast(inf, pron){
+  // Грубая модель для прошедшего времени на русском: инфинитив минус "ть" (+"ся" сохраняем) + л/ла/ло/ли
+  // Подходит для большинства глаголов из списка.
+  const refl = inf.endsWith('ся') || inf.endsWith('сь');
+  const wasSoft = inf.endsWith('сь');
+  let base = inf;
+  if(refl){ base = inf.slice(0, -2); } // убрать "ся"/"сь" временно
+  if(base.endsWith('ть')) base = base.slice(0,-2);
+  let end;
+  if(pron.number==='sg'){
+    if(pron.person===3){
+      end = pron.gender==='f' ? 'ла' : pron.gender==='n' ? 'ло' : 'л';
+    } else {
+      const fem = Math.random()<0.5;
+      end = fem ? 'ла' : 'л';
+    }
+  } else {
+    end = 'ли';
+  }
+  let word = base + end;
+  if(refl) word += wasSoft ? 'сь' : 'ся';
+  return word;
+}
+
+function russianFutureCompound(inf, pron){
+  const aux = (function(){
+    if(pron.number==='sg'){
+      if(pron.person===1) return 'буду';
+      if(pron.person===2) return 'будешь';
+      return 'будет';
+    } else {
+      if(pron.person===1) return 'будем';
+      if(pron.person===2) return 'будете';
+      return 'будут';
+    }
+  })();
+  return `${aux} ${inf}`;
+}
+
+function makePhrase(){
+  const v = pick(VERBS);
+  const tense = Math.random() < 0.5 ? 'past' : 'fut';
+  const plPron = currentPron.pl;
+  let plVerb, ruVerb;
+
+  if(tense==='past'){
+    plVerb = polishPast(v.pl, currentPron);
+    ruVerb = russianPast(v.ru, currentPron);
+  } else {
+    plVerb = polishFutureCompound(v.pl, currentPron);
+    ruVerb = russianFutureCompound(v.ru, currentPron);
+  }
+
+  // Соберём строки
+  const pl = `${plPron} ${plVerb}`;
+  const ru = `${currentPron.ru} ${ruVerb}`;
+
+  // Вывод
+  document.getElementById('plOut').textContent = pl;
+  document.getElementById('ruOut').textContent = ru + `  —  (${v.pl} → ${v.ru})`;
+  document.getElementById('tenseHint').textContent = (tense==='past'?
+    'Время: прошедшее (czas przeszły) — род/число согласованы.' :
+    'Время: будущее составное (czas przyszły złożony) — "będę/będziesz/… + bezokolicznik".'
+  );
+}
+
+// === ИНИТ ===
+currentPron = pick(PRONOUNS);
+showPronoun();
+
+// === UI ===
+const btnPron = document.getElementById('btnPron');
+const btnVerb = document.getElementById('btnVerb');
+btnPron.addEventListener('click', ()=>{ currentPron = pick(PRONOUNS); showPronoun(); });
+btnVerb.addEventListener('click', ()=>{ makePhrase(); });
+
+</script>
+</body>
+</html>
