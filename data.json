@@ -25,6 +25,12 @@
       "url": "projects/byccc/byccc.html",
       "desc": "vremena",
       "icon": "💬"
+    },
+{
+   "name": "Случайный Pikabu",
+      "url": "projects/pikabu/pikabuk.html",
+      "desc": "картинки",
+      "icon": "💬"
     }
   ]
 }
