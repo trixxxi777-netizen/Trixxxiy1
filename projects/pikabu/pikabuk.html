@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Случайный мем с Pikabu 😂</title>
+  <title>Случайный мем с Pikabu 😂 (стабильная версия)</title>
   <style>
     :root { --bg:#0b1020; --card:#121a33; --text:#e7ecff; --muted:#9fb1ff; }
     * { box-sizing: border-box; }
@@ -29,8 +29,8 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Случайный мем с Pikabu</h1>
-      <p>Запрашиваем JSON постов с Pikabu и показываем случайный мем. Только HTTP и JSON.</p>
+      <h1>Случайный мем с Pikabu (стабильная версия)</h1>
+      <p>Используем CORS-прокси, чтобы гарантированно получить JSON с Pikabu и показать мем.</p>
 
       <div class="toolbar">
         <button id="btn">Новый мем 😂</button>
@@ -42,7 +42,7 @@
           <div class="imgBox" id="imgBox">
             <span class="status">Нажмите «Новый мем»</span>
           </div>
-          <div class="hint">API Pikabu поддерживает CORS, но иногда может блокировать запросы с некоторых сайтов.</div>
+          <div class="hint">Используется бесплатный CORS-прокси для стабильной работы в браузере.</div>
         </div>
         <div>
           <div class="json" id="json">{/* Здесь появится JSON ответ */}</div>
@@ -50,7 +50,7 @@
       </div>
 
       <div class="footer">
-        <p>Кнопка вызывает <code>fetch()</code> → HTTP‑запрос → JSON → случайное изображение поста → показываем картинку и JSON.</p>
+        <p>Кнопка вызывает <code>fetch()</code> через CORS-прокси → JSON → случайное изображение → показываем мем и JSON.</p>
       </div>
     </div>
   </div>
@@ -68,19 +68,25 @@
       jsonBox.textContent = '';
 
       try {
-        const resp = await fetch('https://pikabu.ru/ajax/index.php?story_type=story&limit=50');
+        // Бесплатный публичный CORS-прокси
+        const proxy = 'https://api.allorigins.win/get?url=';
+        const target = encodeURIComponent('https://pikabu.ru/ajax/index.php?story_type=story&limit=50');
+
+        const resp = await fetch(proxy + target);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
-        const data = await resp.json();
+        const textData = await resp.json();
+        const data = JSON.parse(textData.contents);
+
         if (!data.stories || data.stories.length === 0) throw new Error('Нет постов');
 
         // Случайный пост
         const post = data.stories[Math.floor(Math.random() * data.stories.length)];
 
-        // Проверяем, есть ли изображения
+        // Проверяем изображения
         if (!post.media || post.media.length === 0) throw new Error('Нет изображений в посте');
 
-        // Берем случайное изображение
+        // Случайное изображение
         const imgData = post.media[Math.floor(Math.random() * post.media.length)];
 
         const img = new Image();
