@@ -14,7 +14,7 @@
       flex-direction: column;
     }
 
-    /* Верхняя панель */
+    /* Верхняя панель с кнопкой, заголовком и логотипом */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -38,6 +38,14 @@
       transform: scale(1.05);
     }
 
+    h1 {
+      font-size: 2em;
+      color: #f0e6d2;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
     #small-logo {
       max-width: 60px;
       height: auto;
@@ -50,13 +58,6 @@
       max-width: 900px;
       margin: 0 auto;
       width: 100%;
-    }
-
-    h1 {
-      font-size: 2.5em;
-      color: #f0e6d2;
-      margin-bottom: 20px;
-      text-align: center;
     }
 
     /* Цветные блоки */
@@ -73,26 +74,26 @@
       line-height: 1.5em;
     }
 
-    .text-block table {
+    table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
 
-    .text-block th, .text-block td {
+    th, td {
       border: 1px solid #fff;
       padding: 10px;
       text-align: center;
     }
 
-    .text-block th {
+    th {
       background-color: #6b4221;
     }
 
     /* Адаптивность */
     @media (max-width: 800px) {
       h1 {
-        font-size: 2em;
+        font-size: 1.5em;
       }
 
       .home-button {
@@ -104,11 +105,7 @@
         max-width: 40px;
       }
 
-      .content {
-        padding: 15px 20px;
-      }
-
-      .text-block table, .text-block th, .text-block td {
+      table, th, td {
         font-size: 0.9em;
       }
     }
@@ -118,50 +115,56 @@
 
   <div class="top-bar">
     <a href="index.html" class="home-button">На главную</a>
+    <h1>Trixxxi Forest</h1>
     <img id="small-logo" src="logo.png" alt="Логотип">
   </div>
 
   <div class="content">
-    <h1>Trixxxi Forest</h1>
 
-    <!-- Таблица спряжения глагола być, первая -->
+    <!-- Таблица спряжения глагола być -->
     <div class="text-block">
-      <p>Спряжение польского глагола <strong>być</strong> по временам и лицам:</p>
+      <p>Спряжение польского глагола <strong>być</strong> по лицам и временам:</p>
       <table>
         <tr>
-          <th>Время \ Лицо</th>
-          <th>Ja</th>
-          <th>Ty</th>
-          <th>On/Ona/Ono</th>
-          <th>My</th>
-          <th>Wy</th>
-          <th>Oni/One</th>
+          <th>Лицо \ Время</th>
+          <th>Прошлое</th>
+          <th>Настоящее</th>
+          <th>Будущее</th>
         </tr>
         <tr>
-          <td>Прошлое</td>
+          <td>Ja</td>
           <td>byłem/byłam</td>
-          <td>byłeś/byłaś</td>
-          <td>był/była/było</td>
-          <td>byliśmy/byłyśmy</td>
-          <td>byliście/byłyście</td>
-          <td>byli/były</td>
-        </tr>
-        <tr>
-          <td>Настоящее</td>
           <td>jestem</td>
-          <td>jesteś</td>
-          <td>jest</td>
-          <td>jesteśmy</td>
-          <td>jesteście</td>
-          <td>są</td>
+          <td>będę</td>
         </tr>
         <tr>
-          <td>Будущее</td>
-          <td>będę</td>
+          <td>Ty</td>
+          <td>byłeś/byłaś</td>
+          <td>jesteś</td>
           <td>będziesz</td>
+        </tr>
+        <tr>
+          <td>On/Ona/Ono</td>
+          <td>był/była/było</td>
+          <td>jest</td>
           <td>będzie</td>
+        </tr>
+        <tr>
+          <td>My</td>
+          <td>byliśmy/byłyśmy</td>
+          <td>jesteśmy</td>
           <td>będziemy</td>
+        </tr>
+        <tr>
+          <td>Wy</td>
+          <td>byliście/byłyście</td>
+          <td>jesteście</td>
           <td>będziecie</td>
+        </tr>
+        <tr>
+          <td>Oni/One</td>
+          <td>byli/były</td>
+          <td>są</td>
           <td>będą</td>
         </tr>
       </table>
