@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title></title>
+  <title>Страница с цветными блоками</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -52,12 +52,41 @@
       width: 100%;
     }
 
-    /* Пустой заголовок */
     h1 {
       font-size: 2.5em;
       color: #f0e6d2;
       margin-bottom: 20px;
       text-align: center;
+    }
+
+    /* Цветные блоки */
+    .text-block {
+      background-color: #8b5a2b;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    }
+
+    .text-block p {
+      margin: 0 0 10px 0;
+      line-height: 1.5em;
+    }
+
+    .text-block table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .text-block th, .text-block td {
+      border: 1px solid #fff;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .text-block th {
+      background-color: #6b4221;
     }
 
     /* Адаптивность */
@@ -78,6 +107,10 @@
       .content {
         padding: 15px 20px;
       }
+
+      .text-block table, .text-block th, .text-block td {
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
@@ -89,10 +122,42 @@
   </div>
 
   <div class="content">
-    <h1></h1>
-    <div id="main-text">
-      <!-- Сюда можно вставлять любой контент: текст, таблицы, картинки -->
+    <h1>Пример цветных блоков</h1>
+
+    <div class="text-block">
+      <p>Это первый цветной блок с текстом. Можно вставлять любой текст, инструкции или описание.</p>
+      <table>
+        <tr>
+          <th>Элемент</th>
+          <th>Описание</th>
+          <th>Пример</th>
+        </tr>
+        <tr>
+          <td>Текст</td>
+          <td>Абзацы, списки, инструкции</td>
+          <td>Пример текста</td>
+        </tr>
+        <tr>
+          <td>Таблицы</td>
+          <td>Можно вставлять данные в строки и колонки</td>
+          <td>Пример таблицы</td>
+        </tr>
+      </table>
     </div>
+
+    <div class="text-block">
+      <p>Второй цветной блок. Можно добавлять картинки, списки, ссылки или что угодно.</p>
+      <ul>
+        <li>Пункт 1</li>
+        <li>Пункт 2</li>
+        <li>Пункт 3</li>
+      </ul>
+    </div>
+
+    <div class="text-block">
+      <p>Третий блок — просто пример. Можно сделать столько блоков, сколько нужно.</p>
+    </div>
+
   </div>
 
 </body>
