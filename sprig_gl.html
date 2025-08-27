@@ -89,23 +89,6 @@
       background-color: #6b4221;
     }
 
-    /* Таблица спряжения */
-    .conj-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 30px;
-    }
-
-    .conj-table th, .conj-table td {
-      border: 1px solid #fff;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .conj-table th {
-      background-color: #6b4221;
-    }
-
     /* Адаптивность */
     @media (max-width: 800px) {
       h1 {
@@ -125,8 +108,7 @@
         padding: 15px 20px;
       }
 
-      .text-block table, .text-block th, .text-block td,
-      .conj-table, .conj-table th, .conj-table td {
+      .text-block table, .text-block th, .text-block td {
         font-size: 0.9em;
       }
     }
@@ -141,6 +123,49 @@
 
   <div class="content">
     <h1>Trixxxi Forest</h1>
+
+    <!-- Таблица спряжения глагола być, первая -->
+    <div class="text-block">
+      <p>Спряжение польского глагола <strong>być</strong> по временам и лицам:</p>
+      <table>
+        <tr>
+          <th>Время \ Лицо</th>
+          <th>Ja</th>
+          <th>Ty</th>
+          <th>On/Ona/Ono</th>
+          <th>My</th>
+          <th>Wy</th>
+          <th>Oni/One</th>
+        </tr>
+        <tr>
+          <td>Прошлое</td>
+          <td>byłem/byłam</td>
+          <td>byłeś/byłaś</td>
+          <td>był/była/było</td>
+          <td>byliśmy/byłyśmy</td>
+          <td>byliście/byłyście</td>
+          <td>byli/były</td>
+        </tr>
+        <tr>
+          <td>Настоящее</td>
+          <td>jestem</td>
+          <td>jesteś</td>
+          <td>jest</td>
+          <td>jesteśmy</td>
+          <td>jesteście</td>
+          <td>są</td>
+        </tr>
+        <tr>
+          <td>Будущее</td>
+          <td>będę</td>
+          <td>będziesz</td>
+          <td>będzie</td>
+          <td>będziemy</td>
+          <td>będziecie</td>
+          <td>będą</td>
+        </tr>
+      </table>
+    </div>
 
     <div class="text-block">
       <p>Это первый цветной блок с текстом. Можно вставлять любой текст, инструкции или описание.</p>
@@ -174,49 +199,6 @@
 
     <div class="text-block">
       <p>Третий блок — просто пример. Можно сделать столько блоков, сколько нужно.</p>
-    </div>
-
-    <!-- Таблица спряжения глагола быть -->
-    <div class="text-block">
-      <p>Спряжение польского глагола <strong>być</strong> по лицам и временам:</p>
-      <table class="conj-table">
-        <tr>
-          <th>Время</th>
-          <th>Ja</th>
-          <th>Ty</th>
-          <th>On/Ona/Ono</th>
-          <th>My</th>
-          <th>Wy</th>
-          <th>Oni/One</th>
-        </tr>
-        <tr>
-          <td>Настоящее</td>
-          <td>jestem</td>
-          <td>jesteś</td>
-          <td>jest</td>
-          <td>jesteśmy</td>
-          <td>jesteście</td>
-          <td>są</td>
-        </tr>
-        <tr>
-          <td>Прошедшее</td>
-          <td>byłem/byłam</td>
-          <td>byłeś/byłaś</td>
-          <td>był/była/było</td>
-          <td>byliśmy/byłyśmy</td>
-          <td>byliście/byłyście</td>
-          <td>byli/były</td>
-        </tr>
-        <tr>
-          <td>Будущее</td>
-          <td>będę</td>
-          <td>będziesz</td>
-          <td>będzie</td>
-          <td>będziemy</td>
-          <td>będziecie</td>
-          <td>będą</td>
-        </tr>
-      </table>
     </div>
 
   </div>
